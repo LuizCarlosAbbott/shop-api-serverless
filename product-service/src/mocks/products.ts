@@ -1,4 +1,4 @@
-import { Product } from "@models/Procuts";
+import { Product } from "../models/Products";
 
 export const products: Product[] = [
   {

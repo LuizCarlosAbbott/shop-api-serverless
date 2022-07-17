@@ -1,8 +1,8 @@
-import { formatJSONResponse } from '@libs/api-gateway';
-import { middyfy } from '@libs/lambda';
+import { formatJSONResponse } from '../../libs/api-gateway';
+import { middyfy } from '../../libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
-import { products as productsMock } from '@mocks/products';
-import { Product } from '@models/Procuts';
+import { products as productsMock } from '../../mocks/products';
+import { Product } from '../../models/Products';
 
 const getProductsListById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   const { productId } = event.pathParameters;

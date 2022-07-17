@@ -1,12 +1,12 @@
 import type { AWS } from '@serverless/typescript';
 
-import getProductsList from '@functions/getProductsList';
-import getProductsListById from '@functions/getProductsListById';
+import getProductsList from './src/functions/getProductsList';
+import getProductsListById from './src/functions/getProductsListById';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-webpack'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -24,6 +24,12 @@ const serverlessConfiguration: AWS = {
   functions: { getProductsList, getProductsListById },
   package: { individually: true },
   custom: {
+    webpack: {
+      config: './webpack.config.js',
+      packager: 'npm',
+      includeModules: true,
+      excludeFiles: 'src/**/*.test.ts'
+    },
     esbuild: {
       bundle: true,
       minify: false,
