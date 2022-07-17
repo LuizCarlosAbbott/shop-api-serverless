@@ -5,8 +5,15 @@ import { Product } from '@models/Product';
 import { products as productsMock } from '@mocks/products';
 
 const getProductsList: APIGatewayProxyHandler = async () => {
-  const products: Product[] = await getProductsListCall();
-  return formatJSONResponse({ products });
+  try {
+    const products: Product[] = await getProductsListCall();
+    return formatJSONResponse({ products });
+  } catch (error) {
+    return {
+      statusCode: 400,
+      body: "Something bad happened during your request"
+    }
+  }
 };
 
 const getProductsListCall = async (): Promise<Product[]> => {

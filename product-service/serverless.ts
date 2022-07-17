@@ -35,7 +35,7 @@ const serverlessConfiguration: AWS = {
     },
     esbuild: {
       bundle: true,
-      minify: false,
+      minify: true,
       sourcemap: true,
       exclude: ['aws-sdk'],
       target: 'node14',
