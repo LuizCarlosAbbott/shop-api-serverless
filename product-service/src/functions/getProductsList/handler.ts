@@ -6,7 +6,7 @@ import { products as productsMock } from '@mocks/products';
 
 const getProductsList: APIGatewayProxyHandler = async (event) => {
   const products: Product[] = await getProductsListCall();
-  return formatJSONResponse({ data: { products } });
+  return formatJSONResponse({ products });
 };
 
 const getProductsListCall = async (): Promise<Product[]> => {

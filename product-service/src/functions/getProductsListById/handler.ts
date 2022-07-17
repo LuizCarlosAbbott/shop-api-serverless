@@ -8,7 +8,7 @@ const getProductsListById: APIGatewayProxyHandler = async (event: APIGatewayEven
   const { productId } = event.pathParameters;
   const product = await getProductCall(productId);
 
-  return formatJSONResponse({ data: { product }});
+  return formatJSONResponse({ product });
 };
 
 const getProductCall = async (productId: string): Promise<Product> => {
