@@ -8,5 +8,8 @@ jspm_packages
 # esbuild directories
 .esbuild
 
-# webpack
+# webpack directories
 .webpack
+
+# swagger directories
+swagger
