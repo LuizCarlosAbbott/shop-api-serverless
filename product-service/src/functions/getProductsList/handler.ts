@@ -10,7 +10,7 @@ const getProductsList: APIGatewayProxyHandler = async () => {
     return formatJSONResponse({ products });
   } catch (error) {
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: "Something bad happened during your request"
     }
   }
