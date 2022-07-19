@@ -9,23 +9,24 @@ describe('getProductsList', () => {
     "price": 2.4,
     "title": "ProductOne"
   }];
+  const eventMock = {
+    body: null,
+    headers: {},
+    multiValueHeaders: {},
+    httpMethod: 'get',
+    isBase64Encoded: false,
+    path: 'products',
+    pathParameters: null,
+    queryStringParameters: null,
+    multiValueQueryStringParameters: null,
+    stageVariables: '' as unknown as APIGatewayProxyEventStageVariables,
+    requestContext: undefined,
+    resource: ""
+  };
 
   it('should return a success with an array of products inside the object', async () => {
     const getProductsListCallSpy = jest.spyOn(ProductList, 'getProductsListCall').mockReturnValue(Promise.resolve(productsMock));
-    const result = await ProductList.getProductsList({
-      body: null,
-      headers: {},
-      multiValueHeaders: {},
-      httpMethod: 'get',
-      isBase64Encoded: false,
-      path: 'products',
-      pathParameters: null,
-      queryStringParameters: null,
-      multiValueQueryStringParameters: null,
-      stageVariables: '' as unknown as APIGatewayProxyEventStageVariables,
-      requestContext: undefined,
-      resource: ""
-    },  {} as Context, () => {});
+    const result = await ProductList.getProductsList(eventMock,  {} as Context, () => {});
     const expected = { 
       body: JSON.stringify({ products: productsMock }), 
       headers: { "Access-Control-Allow-Origin": "*" },
@@ -34,24 +35,11 @@ describe('getProductsList', () => {
 
     expect(getProductsListCallSpy).toHaveBeenCalled();
     expect(result).toEqual(expected);
-  })
+  });
 
   it('should fail returning a statusCode of 500 and a message of error', async () => {
     const getProductsListCallSpy = jest.spyOn(ProductList, 'getProductsListCall').mockReturnValue(Promise.reject());
-    const result = await ProductList.getProductsList({
-      body: null,
-      headers: {},
-      multiValueHeaders: {},
-      httpMethod: 'get',
-      isBase64Encoded: false,
-      path: 'products',
-      pathParameters: null,
-      queryStringParameters: null,
-      multiValueQueryStringParameters: null,
-      stageVariables: '' as unknown as APIGatewayProxyEventStageVariables,
-      requestContext: undefined,
-      resource: ""
-    },  {} as Context, () => {});
+    const result = await ProductList.getProductsList(eventMock,  {} as Context, () => {});
     const expected =  {
       statusCode: 500,
       body: JSON.stringify("Something bad happened during your request")
@@ -59,6 +47,6 @@ describe('getProductsList', () => {
 
     expect(getProductsListCallSpy).toHaveBeenCalled();
     expect(result).toEqual(expected);
-  })
+  });
 });
 
