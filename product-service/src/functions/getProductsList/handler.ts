@@ -1,22 +1,22 @@
-import { formatJSONResponse } from '@libs/api-gateway';
-import { middyfy } from '@libs/lambda';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { Product } from '@models/Product';
-import { products as productsMock } from '@mocks/products';
+import { formatJSONResponse } from '../../libs/api-gateway';
+import { middyfy } from '../../libs/lambda';
+import { products as productsMock } from '../../mocks/products';
+import { Product } from '../../models/Product';
 
-const getProductsList: APIGatewayProxyHandler = async () => {
+export const getProductsList: APIGatewayProxyHandler = async () => {
   try {
     const products: Product[] = await getProductsListCall();
     return formatJSONResponse({ products });
   } catch (error) {
     return {
       statusCode: 500,
-      body: "Something bad happened during your request"
+      body: JSON.stringify("Something bad happened during your request")
     }
   }
 };
 
-const getProductsListCall = async (): Promise<Product[]> => {
+export const getProductsListCall = async (): Promise<Product[]> => {
   return Promise.resolve(productsMock);
 }
 
