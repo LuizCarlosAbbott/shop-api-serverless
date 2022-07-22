@@ -1,1 +1,0 @@
-Frontendend PR: https://github.com/LuizCarlosAbbott/shop-react-redux-cloudfront/pull/2
