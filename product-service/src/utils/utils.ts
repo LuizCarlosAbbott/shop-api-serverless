@@ -1,5 +1,5 @@
 import { Product } from "@models/Product"
-import { ProductEntity } from "./entity/Product"
+import { ProductEntity } from "../entity/Product"
 
 export const convertToProductModel = (product: ProductEntity): Product => {
   return {

@@ -1,44 +1,32 @@
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
+import { getProductCall } from 'src/services/product.service';
 import { AppDataSource } from '../../data-source';
-import { ProductEntity } from '../../entity/Product';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
-import { convertToProductModel } from '../../utils';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
-  try {
-    const product = await AppDataSource.initialize().then(async () => {
-      const { productId } = event.pathParameters;
-      const ProductEntity = await getProductCall(productId);
-      return convertToProductModel(ProductEntity);
-    }).catch(error => console.log(error));
-    AppDataSource.destroy()
-    console.log(product);
-    return formatJSONResponse({ product });
-  } catch (error) {
-    if (error === "Product not found") {
-      return {
-        statusCode: 404,
-        body: JSON.stringify("Product not found")
+  const { productId } = event.pathParameters;
+  console.log('Lambda: getProductsById');
+  console.log(`PATH PARAMETERS -> productId:${productId}`);
+  
+  return await AppDataSource.initialize().then(async () => {
+      const product = await getProductCall(productId);
+      return formatJSONResponse({ product });
+    }).catch(error => {
+      if (error === "Product not found") {
+        return {
+          statusCode: 404,
+          body: JSON.stringify("Product not found")
+        }
+      } else {
+        return {
+          statusCode: 500,
+          body: JSON.stringify("Internal Server Error")
+        }
       }
-    } else {
-      return {
-        statusCode: 500,
-        body: JSON.stringify("Something bad happened during your request")
-      }
-    }
-  }
+    });
 };
 
-export const getProductCall = async (productId: string): Promise<ProductEntity> => {
-  const product = AppDataSource.manager.findOne(ProductEntity, {
-    relations: { stock: true },
-    where: { id: productId }
-  });
-  if (!product) {
-    return Promise.reject("Product not found");
-  }
-  return product;
-}
+
 
 export const main = middyfy(getProductsById);
