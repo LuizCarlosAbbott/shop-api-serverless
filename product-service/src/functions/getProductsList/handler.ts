@@ -7,14 +7,14 @@ import { convertToProductModel } from '../../utils';
 
 export const getProductsList: APIGatewayProxyHandler = async () => {
   try {
-    AppDataSource.initialize().then(async () => {
+    const products = await AppDataSource.initialize().then(async () => {
       const productEntityList = await getProductsListCall();
-      const products = productEntityList.map(product => convertToProductModel(product));
+      return productEntityList.map(product => convertToProductModel(product));      
+    }).catch(error => console.log(error));
+    AppDataSource.destroy()
 
-      console.log("Products: ", products)
-  
-      return formatJSONResponse({ products });
-    }).catch(error => console.log(error))
+    console.log("Products: ", products);
+    return formatJSONResponse({ products });
   } catch (error) {
     return {
       statusCode: 500,

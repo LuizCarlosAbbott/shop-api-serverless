@@ -7,13 +7,14 @@ import { convertToProductModel } from '../../utils';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   try {
-    AppDataSource.initialize().then(async () => {
+    const product = await AppDataSource.initialize().then(async () => {
       const { productId } = event.pathParameters;
       const ProductEntity = await getProductCall(productId);
-      const product = convertToProductModel(ProductEntity);
-      
-      return formatJSONResponse({ product });
-    }).catch(error => console.log(error))
+      return convertToProductModel(ProductEntity);
+    }).catch(error => console.log(error));
+    AppDataSource.destroy()
+    console.log(product);
+    return formatJSONResponse({ product });
   } catch (error) {
     if (error === "Product not found") {
       return {
