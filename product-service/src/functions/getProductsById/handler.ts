@@ -1,15 +1,19 @@
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
+import { AppDataSource } from '../../data-source';
+import { ProductEntity } from '../../entity/Product';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
-import { products as productsMock } from '../../mocks/products';
-import { Product } from '../../models/Product';
+import { convertToProductModel } from '../../utils';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   try {
-    const { productId } = event.pathParameters;
-    const product = await getProductCall(productId);
-    
-    return formatJSONResponse({ product });
+    AppDataSource.initialize().then(async () => {
+      const { productId } = event.pathParameters;
+      const ProductEntity = await getProductCall(productId);
+      const product = convertToProductModel(ProductEntity);
+      
+      return formatJSONResponse({ product });
+    }).catch(error => console.log(error))
   } catch (error) {
     if (error === "Product not found") {
       return {
@@ -25,12 +29,15 @@ export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayE
   }
 };
 
-export const getProductCall = async (productId: string): Promise<Product> => {
-  const product = productsMock.find(({ id }) => id === productId);
+export const getProductCall = async (productId: string): Promise<ProductEntity> => {
+  const product = AppDataSource.manager.findOne(ProductEntity, {
+    relations: { stock: true },
+    where: { id: productId }
+  });
   if (!product) {
     return Promise.reject("Product not found");
   }
-  return Promise.resolve(product);
+  return product;
 }
 
 export const main = middyfy(getProductsById);

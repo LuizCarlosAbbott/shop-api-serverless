@@ -1,4 +1,6 @@
 import type { AWS } from '@serverless/typescript';
+import 'dotenv/config';
+import "reflect-metadata";
 
 import getProductsById from './src/functions/getProductsById';
 import getProductsList from './src/functions/getProductsList';
@@ -6,7 +8,7 @@ import getProductsList from './src/functions/getProductsList';
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-webpack', 'serverless-offline'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -25,19 +27,14 @@ const serverlessConfiguration: AWS = {
   package: { individually: true },
   custom: {
     autoswagger: {
-      typefiles: ['./src/models/Product.ts']
-    },
-    webpack: {
-      config: './webpack.config.js',
-      packager: 'npm',
-      includeModules: true,
-      excludeFiles: 'src/**/*.test.ts'
+      typefiles: ['./src/models/Product.ts'],
+      apiType: 'http'
     },
     esbuild: {
       bundle: true,
       minify: true,
       sourcemap: true,
-      exclude: ['aws-sdk'],
+      exclude: ['aws-sdk', 'pg-native'],
       target: 'node14',
       define: { 'require.resolve': undefined },
       platform: 'node',

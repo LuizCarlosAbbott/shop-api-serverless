@@ -1,13 +1,20 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import { AppDataSource } from '../../data-source';
+import { ProductEntity } from '../../entity/Product';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
-import { products as productsMock } from '../../mocks/products';
-import { Product } from '../../models/Product';
+import { convertToProductModel } from '../../utils';
 
 export const getProductsList: APIGatewayProxyHandler = async () => {
   try {
-    const products: Product[] = await getProductsListCall();
-    return formatJSONResponse({ products });
+    AppDataSource.initialize().then(async () => {
+      const productEntityList = await getProductsListCall();
+      const products = productEntityList.map(product => convertToProductModel(product));
+
+      console.log("Products: ", products)
+  
+      return formatJSONResponse({ products });
+    }).catch(error => console.log(error))
   } catch (error) {
     return {
       statusCode: 500,
@@ -16,8 +23,10 @@ export const getProductsList: APIGatewayProxyHandler = async () => {
   }
 };
 
-export const getProductsListCall = async (): Promise<Product[]> => {
-  return Promise.resolve(productsMock);
+export const getProductsListCall = async (): Promise<ProductEntity[]> => {
+  return AppDataSource.manager.find(ProductEntity, {
+    relations: { stock: true },
+  })
 }
 
 export const main = middyfy(getProductsList);
