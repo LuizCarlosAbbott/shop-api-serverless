@@ -1,14 +1,16 @@
 import type { AWS } from '@serverless/typescript';
 
-import hello from '@functions/hello';
+import getProductsById from './src/functions/getProductsById';
+import getProductsList from './src/functions/getProductsList';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-webpack', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'us-east-1',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -19,12 +21,21 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello },
+  functions: { getProductsList, getProductsById },
   package: { individually: true },
   custom: {
+    autoswagger: {
+      typefiles: ['./src/models/Product.ts']
+    },
+    webpack: {
+      config: './webpack.config.js',
+      packager: 'npm',
+      includeModules: true,
+      excludeFiles: 'src/**/*.test.ts'
+    },
     esbuild: {
       bundle: true,
-      minify: false,
+      minify: true,
       sourcemap: true,
       exclude: ['aws-sdk'],
       target: 'node14',
