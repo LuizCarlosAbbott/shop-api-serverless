@@ -30,7 +30,6 @@ describe('getProductsList', () => {
   
   beforeEach(() => {
     jest.spyOn(AppDataSource, 'initialize').mockResolvedValue('' as unknown as DataSource);
-    jest.spyOn(AppDataSource.manager, 'find').mockResolvedValue([]);
     jest.spyOn(AppDataSource, 'destroy').mockResolvedValue();
   })
 
