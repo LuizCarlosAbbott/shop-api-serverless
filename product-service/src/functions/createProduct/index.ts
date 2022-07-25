@@ -6,8 +6,20 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'products'
+        path: 'products',
+        bodyType: 'helloPostBody'
       },
+      responses: {
+        200: {
+          description: 'Product successfully created'
+        },
+        400: {
+          description: 'Product data is invalid'
+        },
+        500: {
+          description: 'Internal Server Error'
+        }
+      }
     },
   ],
 };

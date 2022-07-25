@@ -28,7 +28,7 @@ const serverlessConfiguration: AWS = {
   package: { individually: true },
   custom: {
     autoswagger: {
-      typefiles: ['./src/models/Product.ts'],
+      typefiles: ['./src/models/Product.ts', './src/types/api-types.d.ts'],
       apiType: 'http'
     },
     esbuild: {

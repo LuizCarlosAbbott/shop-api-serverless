@@ -11,6 +11,12 @@ export default {
           200: {
             description: 'successful API Response',
             bodyType: 'Product'
+          },
+          404: {
+            description: 'Product not found'
+          },
+          500: {
+            description: 'Internal Server Error'
           }
         }
       },
