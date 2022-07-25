@@ -38,7 +38,7 @@ export const createProductCall = async (product: Product): Promise<void> => {
   }).catch(error => Promise.reject(error));
 }
 
-export const isNotValidProductBody = (product: Product): boolean => {
+const isNotValidProductBody = (product: Product): boolean => {
   const { id, title, description, count, price } = product;
 
   if (!validator.isUUID(id)) {
