@@ -13,6 +13,8 @@ export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayE
       const product = await getProductCall(productId);
       return formatJSONResponse({ product });
     }).catch(error => {
+      console.log(error);
+      AppDataSource.destroy();
       if (error === "Product not found") {
         return {
           statusCode: 404,
@@ -24,7 +26,7 @@ export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayE
           body: JSON.stringify("Internal Server Error")
         }
       }
-    });
+    }).finally(() => AppDataSource.destroy());;
 };
 
 

@@ -10,10 +10,13 @@ export const getProductsList: APIGatewayProxyHandler = async () => {
   return await AppDataSource.initialize().then(async () => {
       const products = await getProductsListCall();
       return formatJSONResponse({ products });
-    }).catch(error => ({
-      statusCode: 500,
-      body: JSON.stringify("Internal Server Error")
-    }));
+    }).catch(error => {
+      console.log(error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify("Internal Server Error")
+      }
+  }).finally(() => AppDataSource.destroy());
 };
 
 export const main = middyfy(getProductsList);

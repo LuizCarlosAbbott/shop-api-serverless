@@ -5,7 +5,6 @@ import { AppDataSource } from '../../data-source';
 import { middyfy } from '../../libs/lambda';
 
 export const createProduct: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
-  console.log(event.body)
   const productParameters = event.body;
   console.log(`Lambda: createProduct()`);
   console.log(`BODY: ${JSON.stringify(productParameters)}`);
@@ -17,11 +16,20 @@ export const createProduct: APIGatewayProxyHandler = async (event: APIGatewayEve
         statusCode: 200,
         body: JSON.stringify("Product successfully created")
       };
-    }).catch(error => ({
-        statusCode: 500,
-        body: JSON.stringify("Internal Server Error")
-      })
-    );
+    }).catch(error => {
+      console.log(error);
+      if(error === "Product data is invalid") {
+        return {
+          statusCode: 400,
+          body: JSON.stringify("Product data is invalid")
+        }
+      } else {
+        return {
+          statusCode: 500,
+          body: JSON.stringify("Internal Server Error")
+        }
+      }
+    }).finally(() => AppDataSource.destroy());;
 }
 
 export const main = middyfy(createProduct);
