@@ -1,8 +1,8 @@
 import { Product } from '@models/Product';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
-import { createProductCall } from 'src/services/product.service';
 import { AppDataSource } from '../../data-source';
 import { middyfy } from '../../libs/lambda';
+import { createProductCall } from '../../services/product.service';
 
 export const createProduct: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   const productParameters = event.body;

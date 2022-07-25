@@ -1,8 +1,8 @@
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
-import { getProductCall } from 'src/services/product.service';
 import { AppDataSource } from '../../data-source';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
+import { getProductCall } from '../../services/product.service';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   const { productId } = event.pathParameters;

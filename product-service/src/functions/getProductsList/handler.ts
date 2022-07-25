@@ -1,8 +1,8 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { getProductsListCall } from 'src/services/product.service';
 import { AppDataSource } from '../../data-source';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
+import { getProductsListCall } from '../../services/product.service';
 
 export const getProductsList: APIGatewayProxyHandler = async () => {
   console.log(`Lambda: getProductsList()`);

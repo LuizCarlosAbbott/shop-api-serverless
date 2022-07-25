@@ -1,10 +1,10 @@
 import { Product } from "@models/Product";
 import { randomUUID } from "crypto";
-import { AppDataSource } from "src/data-source";
-import { ProductEntity } from "src/entity/Product";
-import { StockEntity } from "src/entity/Stock";
-import { convertToProductModel } from "src/utils/utils";
 import validator from 'validator';
+import { AppDataSource } from "../data-source";
+import { ProductEntity } from "../entity/Product";
+import { StockEntity } from "../entity/Stock";
+import { convertToProductModel } from "../utils/utils";
 
 export const getProductCall = async (productId: string): Promise<Product> => {
   const product = await AppDataSource.manager.findOne(ProductEntity, {
