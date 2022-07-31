@@ -6,7 +6,6 @@ import { getProductCall } from '../../services/product.service';
 
 export const getProductsById: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   const { productId } = event.pathParameters;
-  console.log('Lambda: getProductsById');
   console.log(`PATH PARAMETERS -> productId:${productId}`);
   
   return await AppDataSource.initialize().then(async () => {

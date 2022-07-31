@@ -1,4 +1,3 @@
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { S3 } from 'aws-sdk';
@@ -20,10 +19,10 @@ const importProductsFile: APIGatewayProxyHandler = async (event) => {
     } 
   } catch (error) {
     console.log(error);
-    return formatJSONResponse({
-      message: `Hello, welcome to the exciting Serverless world!`,
-      event,
-    });
+    return {
+      statusCode: 500,
+      body: JSON.stringify("Internal Server Error")
+    } 
   }
 };
 
@@ -35,7 +34,7 @@ const putSignedUrl = (fileName: string): string => {
     const bucketParams = {
       Bucket: BUCKET,
       Key: `uploaded/${fileName}`,
-      ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ContentType: 'text/csv',
       Expires: 60
   }
   
