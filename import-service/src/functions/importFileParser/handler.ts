@@ -1,9 +1,9 @@
-import { middyfy } from '@libs/lambda';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { S3 } from 'aws-sdk';
 import csvParser from 'csv-parser';
+import { middyfy } from '../../libs/lambda';
 
-const BUCKET = 'epam-shop-serverless-files';
+const BUCKET = process.env.BUCKET;
 
 const importFileParser: APIGatewayProxyHandler = async (event) => {
   console.log(`event: ${JSON.stringify(event)}`);

@@ -1,6 +1,6 @@
-import { handlerPath } from '@libs/handler-resolver';
+import { handlerPath } from '../../libs/handler-resolver';
 
-const BUCKET = 'epam-shop-serverless-files';
+const BUCKET = process.env.BUCKET;
 
 export default {
   handler: `${handlerPath(__dirname)}/handler.main`,

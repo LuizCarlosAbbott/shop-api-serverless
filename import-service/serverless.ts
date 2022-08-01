@@ -3,12 +3,12 @@ import type { AWS } from '@serverless/typescript';
 import importFileParser from '@functions/importFileParser';
 import importProductsFile from '@functions/importProductsFile';
 
-const BUCKET = 'epam-shop-serverless-files';
+const BUCKET = process.env.BUCKET;
 
 const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -41,6 +41,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      BUCKET: process.env.BUCKET
     },
   },
   // import the function via paths

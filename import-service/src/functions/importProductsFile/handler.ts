@@ -1,10 +1,10 @@
-import { middyfy } from '@libs/lambda';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { S3 } from 'aws-sdk';
+import { middyfy } from '../../libs/lambda';
 
-const BUCKET = 'epam-shop-serverless-files';
+const BUCKET = process.env.BUCKET;
 
-const importProductsFile: APIGatewayProxyHandler = async (event) => {
+export const importProductsFile: APIGatewayProxyHandler = async (event) => {
   const { name } = event.queryStringParameters;
   console.log(`QUERY STRING PARAMETERS -> name:${name}`);
 
@@ -28,7 +28,7 @@ const importProductsFile: APIGatewayProxyHandler = async (event) => {
 
 export const main = middyfy(importProductsFile);
 
-const putSignedUrl = (fileName: string): string => {
+export const putSignedUrl = (fileName: string): string => {
   console.log(fileName);
   const s3 = new S3({ region: 'us-east-1' });
     const bucketParams = {

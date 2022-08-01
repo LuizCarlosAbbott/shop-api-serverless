@@ -9,7 +9,7 @@ import getProductsList from './src/functions/getProductsList';
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline', 'serverless-dotenv-plugin'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -21,6 +21,10 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      DB_HOST: process.env.DB_HOST,
+      DB_USERNAME: process.env.DB_USERNAME,
+      DB_PASSWORD: process.env.DB_PASSWORD,
+      DB_NAME: process.env.DB_NAME,
     },
   },
   // import the function via paths

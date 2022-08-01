@@ -7,3 +7,12 @@ jspm_packages
 
 # esbuild directories
 .esbuild
+
+# webpack directories
+.webpack
+
+# swagger directories
+swagger
+
+# environment variables
+.env
