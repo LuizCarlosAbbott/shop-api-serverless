@@ -1,23 +1,22 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import { AppDataSource } from '../../data-source';
 import { formatJSONResponse } from '../../libs/api-gateway';
 import { middyfy } from '../../libs/lambda';
-import { products as productsMock } from '../../mocks/products';
-import { Product } from '../../models/Product';
+import { getProductsListCall } from '../../services/product.service';
 
 export const getProductsList: APIGatewayProxyHandler = async () => {
-  try {
-    const products: Product[] = await getProductsListCall();
-    return formatJSONResponse({ products });
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify("Something bad happened during your request")
-    }
-  }
-};
+  console.log(`Lambda: getProductsList()`);
 
-export const getProductsListCall = async (): Promise<Product[]> => {
-  return Promise.resolve(productsMock);
-}
+  return await AppDataSource.initialize().then(async () => {
+      const products = await getProductsListCall();
+      return formatJSONResponse({ products });
+    }).catch(error => {
+      console.log(error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify("Internal Server Error")
+      }
+  }).finally(() => AppDataSource.destroy());
+};
 
 export const main = middyfy(getProductsList);
