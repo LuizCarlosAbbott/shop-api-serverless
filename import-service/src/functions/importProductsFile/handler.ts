@@ -1,8 +1,6 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { S3 } from 'aws-sdk';
+import { putSignedUrl } from 'src/services/s3.service';
 import { middyfy } from '../../libs/lambda';
-
-const BUCKET = process.env.BUCKET;
 
 export const importProductsFile: APIGatewayProxyHandler = async (event) => {
   const { name } = event.queryStringParameters;
@@ -27,17 +25,3 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
 };
 
 export const main = middyfy(importProductsFile);
-
-export const putSignedUrl = (fileName: string): string => {
-  console.log(fileName);
-  const s3 = new S3({ region: 'us-east-1' });
-  const bucketParams = {
-    Bucket: BUCKET,
-    Key: `uploaded/${fileName}`,
-    ContentType: 'text/csv',
-    Expires: 60
-  }
-  
-  const signedUrl = s3.getSignedUrl('putObject', bucketParams);
-  return signedUrl;
-}
