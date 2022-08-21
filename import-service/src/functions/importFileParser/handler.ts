@@ -7,6 +7,7 @@ const importFileParser: APIGatewayProxyHandler = async (event) => {
 
   try {
     await getAndParseBucketObject(event);
+    
     return {
       statusCode: 200,
       body: JSON.stringify(''),

@@ -56,6 +56,21 @@ export const createProductCall = async (product: Product): Promise<void> => {
   });
 }
 
+export const createBatchProductCall = async (product: Product): Promise<void> => {
+  const { id = randomUUID(), title, description, count, price } = product;
+
+  console.log({ id, title, description, count, price });
+
+  if (isNotValidProductBody({ id, title, description, count, price })) {
+    return Promise.reject("Product data is invalid");
+  }
+  
+  return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+    await transactionalEntityManager.save(ProductEntity, { id, title, description, price });
+    await transactionalEntityManager.save(StockEntity, { product_id: id, count });
+  }).catch(error => Promise.reject(error));
+}
+
 const isNotValidProductBody = (product: Product): boolean => {
   const { id, title, description, count, price } = product;
 

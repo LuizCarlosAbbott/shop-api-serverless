@@ -1,12 +1,12 @@
 import { S3 } from "aws-sdk";
 import csvParser from "csv-parser";
+import { resolve } from "path";
+import { sendMessageToSQS } from "./sqs.service";
 
 const s3 = new S3({ region: 'us-east-1' });
 const BUCKET = process.env.BUCKET;
 
 export const getAndParseBucketObject = async (event) => {
-  console.log(BUCKET);
-  console.log('${env:BUCKET}')
   for (const record of event.Records) {
     console.log(record);
     
@@ -15,23 +15,25 @@ export const getAndParseBucketObject = async (event) => {
       Key: record.s3.object.key
     }).createReadStream();
 
-    const results = [];
-
-    await s3Stream
-      .pipe(csvParser())
-      .on('data', (data) => results.push(data))
-      .on('error', (error) => {
-        console.log(error);
-      })
-      .on('end', () => {
-        results.map(item => {
-          console.log(`Adding item: ${JSON.stringify(item)}`);
+    await new Promise(() => {
+      s3Stream
+        .pipe(csvParser())
+        .on('data', (data) => {
+          data.price = Number(data.price);
+          data.count = Number(data.count);
+          const itemToBeSent = JSON.stringify(data).replace("\ufeff", '');
+          sendMessageToSQS(itemToBeSent);
         })
-      });
-
-    await copyAndDeleteObject(record);   
-
-    console.log(`Excel file ` + record.s3.object.key.split('/')[1] + ' has been parsed!');
+        .on('error', (error) => {
+          console.log(error);
+        })
+        .on('end', async () => {
+          await copyAndDeleteObject(record);   
+          console.log(`Excel file ` + record.s3.object.key.split('/')[1] + ' has been parsed!');
+          resolve();
+        }
+      )}
+    );
   }
 }
 

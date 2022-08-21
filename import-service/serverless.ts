@@ -29,6 +29,21 @@ const serverlessConfiguration: AWS = {
               Effect: 'Allow',
               Action: 's3:*',
               Resource: `arn:aws:s3:::${'${env:BUCKET}'}/*`
+            },
+            {
+              Effect: 'Allow',
+              Action: 'sqs:SendMessage',
+              Resource: {
+                'Fn::Join': [
+                  ':',
+                  [
+                    'arn:aws:sqs',
+                    '${env:REGION}',
+                    '${env:ACCOUNTID}',
+                    '${env:SQS}',
+                  ],
+                ],
+              }
             }
         ]
       }
@@ -40,7 +55,10 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      BUCKET: process.env.BUCKET
+      BUCKET: process.env.BUCKET,
+      REGION: process.env.REGION,
+      ACCOUNTID: process.env.ACCOUNTID,
+      SQS: process.env.SQS
     },
   },
   // import the function via paths
