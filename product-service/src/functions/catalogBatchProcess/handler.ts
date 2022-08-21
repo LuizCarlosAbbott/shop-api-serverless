@@ -1,21 +1,33 @@
-import { SQSEvent, SQSHandler } from 'aws-lambda';
-import { AppDataSource } from '../../data-source';
+import { SQSBatchItemFailure, SQSEvent, SQSHandler } from 'aws-lambda';
+import { createProductCall } from 'src/services/product.service';
 import { middyfy } from '../../libs/lambda';
 export const catalogBatchProcess: SQSHandler = async (event: SQSEvent) => {
   const productParameters = event.Records;
+  const failedProducts: SQSBatchItemFailure[] = [];
   console.log(`Lambda: catalogBatchProcess()`);
   console.log(`Records: ${JSON.stringify(productParameters)}`);
 
-  return await AppDataSource.initialize()
-    .then(async () => {
-      event.Records.map(async (record) => {
-        console.log(record);
-        console.log('body: ' + JSON.parse(record.body))
-      });
-    }).catch(error => {
-      console.log(error);
+  await Promise.all(
+    event.Records.map(async (record) => {
+      console.log(`Message Body: ${record.body}`);
+      const recordBody = JSON.parse(record.body)
+      
+      try {
+        await createProductCall(recordBody);
+      } catch (error) {
+        console.log(error);
+        failedProducts.push(recordBody.messageId);
+      }
+    })
+  );
 
-    }).finally(() => AppDataSource.destroy());;
+  if (failedProducts.length) {
+    console.log(`The following items were not created successfully: ${JSON.stringify(failedProducts)}`);
+  }
+
+  return {
+    batchItemFailures: failedProducts
+  }
 }
 
 export const main = middyfy(catalogBatchProcess);

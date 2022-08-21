@@ -50,7 +50,10 @@ export const createProductCall = async (product: Product): Promise<void> => {
     }).catch(error => Promise.reject(error));
   })
   .catch(error => error)
-  .finally(() => AppDataSource.destroy());
+  .finally(() => {
+    console.log(`Product creation was successful: ${JSON.stringify(product)}`);
+    AppDataSource.destroy();
+  });
 }
 
 const isNotValidProductBody = (product: Product): boolean => {
