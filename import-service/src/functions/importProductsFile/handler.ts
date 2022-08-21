@@ -31,11 +31,11 @@ export const main = middyfy(importProductsFile);
 export const putSignedUrl = (fileName: string): string => {
   console.log(fileName);
   const s3 = new S3({ region: 'us-east-1' });
-    const bucketParams = {
-      Bucket: BUCKET,
-      Key: `uploaded/${fileName}`,
-      ContentType: 'text/csv',
-      Expires: 60
+  const bucketParams = {
+    Bucket: BUCKET,
+    Key: `uploaded/${fileName}`,
+    ContentType: 'text/csv',
+    Expires: 60
   }
   
   const signedUrl = s3.getSignedUrl('putObject', bucketParams);
