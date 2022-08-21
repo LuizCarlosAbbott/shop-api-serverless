@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 import 'dotenv/config';
 import "reflect-metadata";
 
+import catalogBatchProcess from './src/functions/catalogBatchProcess';
 import createProduct from './src/functions/createProduct';
 import getProductsById from './src/functions/getProductsById';
 import getProductsList from './src/functions/getProductsList';
@@ -28,7 +29,31 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { getProductsList, getProductsById, createProduct },
+  functions: { getProductsList, getProductsById, createProduct, catalogBatchProcess },
+  resources: {
+    Resources: {
+      CatalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalog-items-queue',
+          MessageRetentionPeriod: 200,
+          RedrivePolicy: {
+            deadLetterTargetArn: {
+              'Fn::GetAtt': ['CatalogItemsDeadLetterQueue', 'Arn'],
+            },
+            maxReceiveCount: 3,
+          },
+          VisibilityTimeout: 15,
+        },
+      },
+      CatalogItemsDeadLetterQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalog-items-dead-letter-queue',
+        },
+      },
+    },
+  },
   package: { individually: true },
   custom: {
     autoswagger: {
