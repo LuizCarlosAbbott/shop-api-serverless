@@ -56,7 +56,7 @@ export const createProductCall = async (product: Product): Promise<void> => {
   });
 }
 
-export const createBatchProductCall = async (product: Product): Promise<void> => {
+export const createBatchProductCall = async (product: Product): Promise<Product> => {
   const { id = randomUUID(), title, description, count, price } = product;
 
   console.log({ id, title, description, count, price });
@@ -68,6 +68,7 @@ export const createBatchProductCall = async (product: Product): Promise<void> =>
   return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
     await transactionalEntityManager.save(ProductEntity, { id, title, description, price });
     await transactionalEntityManager.save(StockEntity, { product_id: id, count });
+    return ({ id, title, description, count, price });
   }).catch(error => Promise.reject(error));
 }
 

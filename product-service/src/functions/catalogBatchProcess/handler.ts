@@ -1,37 +1,45 @@
+import { Product } from '@models/Product';
 import { SQSBatchItemFailure, SQSEvent, SQSHandler } from 'aws-lambda';
 import { AppDataSource } from 'src/data-source';
 import { createBatchProductCall } from 'src/services/product.service';
+import { snsPublish } from 'src/services/sns.service';
 import { middyfy } from '../../libs/lambda';
 export const catalogBatchProcess: SQSHandler = async (event: SQSEvent) => {
   const productParameters = event.Records;
-  const failedProducts: SQSBatchItemFailure[] = [];
+  const batchItemFailures: SQSBatchItemFailure[] = [];
+  const successfulProducts: Product[] = [];
   console.log(`Lambda: catalogBatchProcess()`);
   console.log(`Records: ${JSON.stringify(productParameters)}`);
   
-  await AppDataSource.initialize()
+  return await AppDataSource.initialize()
     .then(async () => {
       for (const record of event.Records) {
         console.log(`Message Body: ${record.body}`);
         const recordBody = JSON.parse(record.body)
         
         try {
-          await createBatchProductCall(recordBody);
+          const product = await createBatchProductCall(recordBody);
+          successfulProducts.push(product);
         } catch (error) {
           console.log(error);
-          failedProducts.push(recordBody.messageId);
+          batchItemFailures.push({ itemIdentifier: record.messageId });
         }
       }
     }).catch(error => {
       console.log(error);
-    }).finally(() => AppDataSource.destroy());;
+    }).finally(async () => {
+      AppDataSource.destroy();
 
-  if (failedProducts.length) {
-    console.log(`The following items were not created successfully: ${JSON.stringify(failedProducts)}`);
-  }
+      if (successfulProducts.length) {
+        const message = JSON.stringify(successfulProducts);
+        console.log(`The following items were created successfully: ${message}`);
+        await snsPublish(message, 'Successful Products Creation');
+      }
 
-  return {
-    batchItemFailures: failedProducts
-  }
+      return {
+        batchItemFailures
+      }
+    });;
 }
 
 export const main = middyfy(catalogBatchProcess);

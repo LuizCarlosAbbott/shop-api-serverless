@@ -26,7 +26,19 @@ const serverlessConfiguration: AWS = {
       DB_USERNAME: process.env.DB_USERNAME,
       DB_PASSWORD: process.env.DB_PASSWORD,
       DB_NAME: process.env.DB_NAME,
+      REGION: process.env.REGION,
+      SQS: process.env.SQS,
+      SQS_DLQ: process.env.SQS_DLQ,
+      SNS_EMAIL: process.env.SNS_EMAIL,
+      SNS_ARN: process.env.SNS_ARN
     },
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: 'sns:*',
+        Resource: [{ Ref: 'createBatchProductTopic' }],
+      },
+    ]
   },
   // import the function via paths
   functions: { getProductsList, getProductsById, createProduct, catalogBatchProcess },
@@ -35,21 +47,38 @@ const serverlessConfiguration: AWS = {
       CatalogItemsQueue: {
         Type: 'AWS::SQS::Queue',
         Properties: {
-          QueueName: 'catalog-items-queue',
+          QueueName: '${env:SQS}',
           MessageRetentionPeriod: 200,
+          ReceiveMessageWaitTimeSeconds: 20,
           RedrivePolicy: {
-            deadLetterTargetArn: {
-              'Fn::GetAtt': ['CatalogItemsDeadLetterQueue', 'Arn'],
-            },
-            maxReceiveCount: 3,
-          },
-          VisibilityTimeout: 15,
+            deadLetterTargetArn: { 'Fn::GetAtt': ['CatalogItemsDeadLetterQueue', 'Arn'] },
+            maxReceiveCount: 5,
+          }
         },
       },
       CatalogItemsDeadLetterQueue: {
         Type: 'AWS::SQS::Queue',
         Properties: {
-          QueueName: 'catalog-items-dead-letter-queue',
+          QueueName: '${env:SQS_DLQ}',
+        },
+      },
+      createBatchProductTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: 'createBatchProductTopic',
+        },
+      },
+      SNSSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: '${env:SNS_EMAIL}',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'createBatchProductTopic',
+          },
+          FilterPolicy: {
+            status: ["success"]
+          }
         },
       },
     },
