@@ -1,14 +1,17 @@
+import basicAuthorizer from '@functions/basicAuthorizer';
 import type { AWS } from '@serverless/typescript';
-
-import hello from '@functions/hello';
 
 const serverlessConfiguration: AWS = {
   service: 'authorization-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: [
+    'serverless-esbuild',
+    'serverless-dotenv-plugin'
+  ],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'us-east-1',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -18,8 +21,6 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
   },
-  // import the function via paths
-  functions: { hello },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -32,6 +33,18 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10,
     },
+  },
+  functions: { basicAuthorizer },
+  resources: {
+    Outputs: {
+			BasicAuthorizerFunctionArn: {
+        Description: 'Basic authorizer ARN',
+				Value: { "Fn::GetAtt": ["BasicAuthorizerLambdaFunction", "Arn"] },
+				Export: {
+          Name: { "Fn::Sub": "${AWS::StackName}-BasicAuthorizerArn" },
+        }
+			},
+		},
   },
 };
 
