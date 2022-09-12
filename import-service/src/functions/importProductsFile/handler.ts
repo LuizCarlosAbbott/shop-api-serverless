@@ -13,6 +13,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
       body: JSON.stringify(signedUrl),
       headers: {
         "Access-Control-Allow-Origin" : "*",
+        'Access-Control-Allow-Headers': '*'
       }
     } 
   } catch (error) {

@@ -6,7 +6,17 @@ export default {
     {
       http: {
         method: 'get',
-        path: 'import'
+        path: 'import',
+        cors: true,
+        authorizer: {
+          name: 'basicAuthorizer',
+          arn: {
+            "Fn::ImportValue": "authorization-service-dev-BasicAuthorizerArn",
+          },
+          resultTtlInSeconds: 0,
+          identitySource: 'method.request.header.Authorization',
+          type: 'token',
+        },
       }
     },
   ],
